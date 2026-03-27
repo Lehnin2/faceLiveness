@@ -1,0 +1,107 @@
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv
+.env
+*.venv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# AI Models
+*.pt
+*.pth
+*.model
+*.h5
+*.pkl
+*.pickle
+*.joblib
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+identity_platform.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Flask
+instance/
+.webassets-cache
+
+# Uploads
+uploads/
+tmp/
+temp/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment-specific
+.env.local
+.env.*.local
+config.local.py
+
+# Certificates (self-signed for local dev)
+*.pem
+*.crt
+*.key
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# Mac
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db

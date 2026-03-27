@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Verification - BiometricID</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+    
+    <style>
+        .verification-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .camera-container {
+            position: relative;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        #videoElement {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        
+        .status-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 10;
+        }
+        
+        .challenge-indicator {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .ai-status {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .verification-controls {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .verification-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .verification-failed {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .verification-steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .step-icon.completed {
+            background: #28a745;
+        }
+        
+        .step-icon.active {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-fingerprint me-2"></i>
+                BiometricID
+            </a>
+            
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('index') }}">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <div class="verification-container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-user-shield me-2"></i>
+                                Biometric Identity Verification
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Verification Steps -->
+                            <div class="verification-steps">
+                                <h5 class="mb-3">Verification Process</h5>
+                                <div class="step">
+                                    <div class="step-icon" id="step1-icon">1</div>
+                                    <div>
+                                        <strong>Camera Access</strong>
+                                        <div class="text-muted">Allow camera access for face detection</div>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-icon" id="step2-icon">2</div>
+                                    <div>
+                                        <strong>Face Detection</strong>
+                                        <div class="text-muted">Position your face in the camera frame</div>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-icon" id="step3-icon">3</div>
+                                    <div>
+                                        <strong>Liveness Challenge</strong>
+                                        <div class="text-muted">Complete the requested action</div>
+                                    </div>
+                                </div>
+                                <div class="step">
+                                    <div class="step-icon" id="step4-icon">4</div>
+                                    <div>
+                                        <strong>AI Verification</strong>
+                                        <div class="text-muted">AI confirms you're a real person</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Camera Container -->
+                            <div class="camera-container">
+                                <video id="videoElement" autoplay muted></video>
+                                <canvas id="canvasElement" style="display: none;"></canvas>
+                                
+                                <!-- Status Overlay -->
+                                <div class="status-overlay">
+                                    <div class="challenge-indicator" id="challengeIndicator">
+                                        <i class="fas fa-video me-2"></i>
+                                        Click "Start Verification" to begin
+                                    </div>
+                                    <div class="ai-status" id="aiStatus">
+                                        <i class="fas fa-robot me-2"></i>
+                                        AI Status: Ready
+                                    </div>
+                                </div>
+                                
+                                <!-- Loading Overlay -->
+                                <div class="overlay" id="loadingOverlay">
+                                    <div>
+                                        <div class="loading-spinner mb-3"></div>
+                                        <div>Initializing camera...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="verification-controls">
+                                <button class="btn btn-primary btn-lg me-3" id="startBtn">
+                                    <i class="fas fa-play me-2"></i>Start Verification
+                                </button>
+                                <button class="btn btn-secondary btn-lg" id="stopBtn" disabled>
+                                    <i class="fas fa-stop me-2"></i>Stop Verification
+                                </button>
+                            </div>
+
+                            <!-- Progress Bar -->
+                            <div class="progress-container" id="progressContainer" style="display: none;">
+                                <div class="progress">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                         role="progressbar" id="progressBar" style="width: 0%"></div>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted" id="progressText">Verification in progress...</small>
+                                </div>
+                            </div>
+
+                            <!-- Result Messages -->
+                            <div id="resultContainer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    
+    <script>
+        // Initialize Socket.IO
+        const socket = io();
+        
+        // DOM Elements
+        const videoElement = document.getElementById('videoElement');
+        const canvasElement = document.getElementById('canvasElement');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const challengeIndicator = document.getElementById('challengeIndicator');
+        const aiStatus = document.getElementById('aiStatus');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const resultContainer = document.getElementById('resultContainer');
+        
+        // State variables
+        let mediaStream = null;
+        let isVerifying = false;
+        let animationId = null;
+        let sessionId = null;
+        
+        // Step management
+        const steps = ['step1-icon', 'step2-icon', 'step3-icon', 'step4-icon'];
+        let currentStep = 0;
+        
+        function updateStep(stepIndex, status = 'active') {
+            steps.forEach((stepId, index) => {
+                const element = document.getElementById(stepId);
+                element.classList.remove('active', 'completed');
+                if (index < stepIndex) {
+                    element.classList.add('completed');
+                } else if (index === stepIndex) {
+                    element.classList.add(status);
+                }
+            });
+        }
+        
+        // Initialize camera
+        async function initializeCamera() {
+            try {
+                loadingOverlay.style.display = 'flex';
+                
+                mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 640, height: 480 },
+                    audio: false
+                });
+                
+                videoElement.srcObject = mediaStream;
+                loadingOverlay.style.display = 'none';
+                updateStep(0, 'completed');
+                updateStep(1, 'active');
+                
+                return true;
+            } catch (error) {
+                console.error('Camera initialization failed:', error);
+                loadingOverlay.innerHTML = '<div><i class="fas fa-exclamation-triangle mb-3"></i><div>Camera access denied</div></div>';
+                return false;
+            }
+        }
+        
+        // Start verification
+        async function startVerification() {
+            if (!await initializeCamera()) return;
+            
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            isVerifying = true;
+            
+            progressContainer.style.display = 'block';
+            
+            // Start Socket.IO session
+            socket.emit('start_verification');
+            
+            // Start frame processing
+            processFrames();
+        }
+        
+        // Stop verification
+        function stopVerification() {
+            isVerifying = false;
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+            }
+            
+            socket.emit('stop_verification');
+            progressContainer.style.display = 'none';
+            
+            // Reset steps
+            updateStep(0, 'active');
+        }
+        
+        // Process video frames
+        function processFrames() {
+    if (!isVerifying) return;
+    
+    const canvas = canvasElement;
+    const context = canvas.getContext('2d');
+    
+    canvas.width = videoElement.videoWidth;
+    canvas.height = videoElement.videoHeight;
+    
+    context.drawImage(videoElement, 0, 0);
+    
+    // Convert canvas to base64
+    const frameData = canvas.toDataURL('image/jpeg', 0.8);
+    
+    // Send frame to server WITH session_id
+    socket.emit('process_frame', { 
+        frame: frameData,
+        session_id: sessionId  // Include session ID (this was missing!)
+    });
+    
+    // Continue processing
+    animationId = requestAnimationFrame(processFrames);
+}
+
+        
+        // Socket event handlers
+        socket.on('verification_started', (data) => {
+            sessionId = data.session_id;
+            challengeIndicator.innerHTML = `<i class="fas fa-eye me-2"></i>Challenge: ${data.challenge.replace('_', ' ')}`;
+            updateStep(2, 'active');
+        });
+        
+        socket.on('frame_processed', (data) => {
+            // Update challenge indicator
+            challengeIndicator.innerHTML = `<i class="fas fa-eye me-2"></i>${data.message}`;
+            
+            // Update AI status
+            aiStatus.innerHTML = `<i class="fas fa-robot me-2"></i>${data.ai_status}`;
+            
+            // Update progress based on status
+            if (data.status === 'success') {
+                progressBar.style.width = '100%';
+                progressText.textContent = 'Verification successful!';
+                updateStep(3, 'completed');
+            } else if (data.status === 'processing') {
+                progressBar.style.width = '60%';
+                progressText.textContent = 'Processing...';
+            }
+        });
+        
+        socket.on('verification_complete', (data) => {
+            isVerifying = false;
+            stopBtn.disabled = true;
+            progressContainer.style.display = 'none';
+            
+            if (data.result === 'verified') {
+                resultContainer.innerHTML = `
+                    <div class="verification-success">
+                        <h3><i class="fas fa-check-circle me-2"></i>Verification Successful!</h3>
+                        <p class="mb-0">Your identity has been verified successfully.</p>
+                        <button class="btn btn-light mt-3" onclick="window.location.href='${window.location.origin}'">
+                            <i class="fas fa-home me-2"></i>Return to Dashboard
+                        </button>
+                    </div>
+                `;
+                updateStep(3, 'completed');
+            } else {
+                resultContainer.innerHTML = `
+                    <div class="verification-failed">
+                        <h3><i class="fas fa-times-circle me-2"></i>Verification Failed</h3>
+                        <p class="mb-0">${data.message}</p>
+                        <button class="btn btn-light mt-3" onclick="location.reload()">
+                            <i class="fas fa-redo me-2"></i>Try Again
+                        </button>
+                    </div>
+                `;
+            }
+            
+            // Stop camera
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+            }
+        });
+        
+        socket.on('error', (data) => {
+            console.error('Socket error:', data.message);
+            resultContainer.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Error: ${data.message}
+                </div>
+            `;
+        });
+        
+        // Event listeners
+        startBtn.addEventListener('click', startVerification);
+        stopBtn.addEventListener('click', stopVerification);
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (isVerifying) {
+                stopVerification();
+            }
+        });
+        
+        // Initialize first step
+        updateStep(0, 'active');
+    </script>
+</body>
+</html>

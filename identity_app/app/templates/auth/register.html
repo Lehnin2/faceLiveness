@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+
+{% block title %}Register - BiometricID Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-container {
+        max-width: 500px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .register-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .register-header i {
+        font-size: 3rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-register {
+        width: 100%;
+        padding: 0.75rem;
+        font-weight: 600;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        transition: transform 0.2s;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .password-strength {
+        margin-top: 0.5rem;
+        padding: 0.5rem;
+        background: #f8f9fa;
+        border-radius: 5px;
+        font-size: 0.875rem;
+    }
+    
+    .strength-bar {
+        height: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+        margin: 0.5rem 0;
+        overflow: hidden;
+    }
+    
+    .strength-fill {
+        height: 100%;
+        transition: width 0.3s, background-color 0.3s;
+        border-radius: 2px;
+    }
+    
+    .strength-weak { width: 25%; background-color: #dc3545; }
+    .strength-fair { width: 50%; background-color: #fd7e14; }
+    .strength-good { width: 75%; background-color: #ffc107; }
+    .strength-strong { width: 100%; background-color: #28a745; }
+    
+    .requirements {
+        list-style: none;
+        padding: 0;
+        margin-top: 0.5rem;
+    }
+    
+    .requirements li {
+        padding: 0.2rem 0;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .requirements li i {
+        margin-right: 0.5rem;
+        width: 16px;
+    }
+    
+    .requirements li.valid {
+        color: #28a745;
+    }
+    
+    .requirements li.invalid {
+        color: #dc3545;
+    }
+    
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .security-features {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .security-features h6 {
+        margin-bottom: 1rem;
+        color: #495057;
+    }
+    
+    .security-features .feature {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .security-features .feature i {
+        margin-right: 0.5rem;
+        color: #28a745;
+        width: 16px;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .navbar {
+        background: rgba(255,255,255,0.1) !important;
+        backdrop-filter: blur(10px);
+    }
+    
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="register-header">
+        <i class="fas fa-user-plus"></i>
+        <h2>Create Account</h2>
+        <p class="text-muted">Join our secure biometric platform</p>
+    </div>
+    
+    <form method="POST" novalidate id="registerForm">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-floating">
+            {{ form.username(class="form-control", placeholder="Username") }}
+            {{ form.username.label(class="form-label") }}
+            {% if form.username.errors %}
+                <div class="error-message">
+                    {% for error in form.username.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-floating">
+            {{ form.email(class="form-control", placeholder="Email") }}
+            {{ form.email.label(class="form-label") }}
+            {% if form.email.errors %}
+                <div class="error-message">
+                    {% for error in form.email.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Add missing fields from your form -->
+        <div class="form-floating">
+            {{ form.first_name(class="form-control", placeholder="First Name") }}
+            {{ form.first_name.label(class="form-label") }}
+            {% if form.first_name.errors %}
+                <div class="error-message">
+                    {% for error in form.first_name.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-floating">
+            {{ form.last_name(class="form-control", placeholder="Last Name") }}
+            {{ form.last_name.label(class="form-label") }}
+            {% if form.last_name.errors %}
+                <div class="error-message">
+                    {% for error in form.last_name.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-floating">
+            {{ form.phone_number(class="form-control", placeholder="Phone Number (Optional)") }}
+            {{ form.phone_number.label(class="form-label") }}
+            {% if form.phone_number.errors %}
+                <div class="error-message">
+                    {% for error in form.phone_number.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-floating">
+            {{ form.password(class="form-control", placeholder="Password", id="password") }}
+            {{ form.password.label(class="form-label") }}
+            {% if form.password.errors %}
+                <div class="error-message">
+                    {% for error in form.password.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="password-strength" id="passwordStrength" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="text-muted">Password Strength:</span>
+                <span id="strengthText" class="fw-bold">Weak</span>
+            </div>
+            <div class="strength-bar">
+                <div class="strength-fill" id="strengthBar"></div>
+            </div>
+            <ul class="requirements">
+                <li id="length"><i class="fas fa-times"></i>At least 8 characters</li>
+                <li id="uppercase"><i class="fas fa-times"></i>One uppercase letter</li>
+                <li id="lowercase"><i class="fas fa-times"></i>One lowercase letter</li>
+                <li id="number"><i class="fas fa-times"></i>One number</li>
+                <li id="special"><i class="fas fa-times"></i>One special character</li>
+            </ul>
+        </div>
+        
+        <div class="form-floating">
+            {{ form.password2(class="form-control", placeholder="Confirm Password", id="password2") }}
+            {{ form.password2.label(class="form-label") }}
+            {% if form.password2.errors %}
+                <div class="error-message">
+                    {% for error in form.password2.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div id="passwordMatch" class="error-message" style="display: none;"></div>
+        </div>
+        
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+            <label class="form-check-label" for="agreeTerms">
+                I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> 
+                and <a href="#" class="text-decoration-none">Privacy Policy</a>
+            </label>
+        </div>
+        
+        {{ form.submit(class="btn btn-primary btn-register", id="registerBtn") }}
+        
+        <!-- Debug info -->
+        <div id="debugInfo" style="margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 5px; display: none;">
+            <h6>Debug Information:</h6>
+            <ul id="debugList"></ul>
+        </div>
+    </form>
+    
+    <div class="login-link">
+        <p class="mb-0">Already have an account? 
+            <a href="{{ url_for('auth.login') }}" class="text-decoration-none fw-bold">Sign in here</a>
+        </p>
+    </div>
+    
+    <div class="security-features">
+        <h6><i class="fas fa-shield-alt me-2"></i>Security Features</h6>
+        <div class="feature">
+            <i class="fas fa-fingerprint"></i>
+            <span>Advanced biometric verification</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-lock"></i>
+            <span>End-to-end encryption</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-eye"></i>
+            <span>Real-time liveness detection</span>
+        </div>
+        <div class="feature">
+            <i class="fas fa-brain"></i>
+            <span>AI-powered anti-spoofing</span>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const password2Input = document.getElementById('password2');
+    const strengthDiv = document.getElementById('passwordStrength');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    const registerBtn = document.getElementById('registerBtn');
+    const agreeTerms = document.getElementById('agreeTerms');
+    const passwordMatch = document.getElementById('passwordMatch');
+    const debugInfo = document.getElementById('debugInfo');
+    const debugList = document.getElementById('debugList');
+    
+    // Enable debug mode
+    const DEBUG = true;
+    
+    function updateDebugInfo() {
+        if (!DEBUG) return;
+        
+        const password = passwordInput.value;
+        const password2 = password2Input.value;
+        const isPasswordStrong = password.length > 0 && checkPasswordStrength(password);
+        const isPasswordMatch = password === password2 && password2.length > 0;
+        const isTermsAgreed = agreeTerms.checked;
+        
+        debugList.innerHTML = `
+            <li>Password Strong: ${isPasswordStrong}</li>
+            <li>Passwords Match: ${isPasswordMatch}</li>
+            <li>Terms Agreed: ${isTermsAgreed}</li>
+            <li>Button Disabled: ${registerBtn.disabled}</li>
+        `;
+        debugInfo.style.display = 'block';
+    }
+    
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        const requirements = {
+            length: password.length >= 8,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[^A-Za-z0-9]/.test(password)
+        };
+        
+        // Update requirement list
+        Object.keys(requirements).forEach(req => {
+            const element = document.getElementById(req);
+            if (element) {
+                const icon = element.querySelector('i');
+                if (requirements[req]) {
+                    element.classList.add('valid');
+                    element.classList.remove('invalid');
+                    icon.className = 'fas fa-check';
+                } else {
+                    element.classList.add('invalid');
+                    element.classList.remove('valid');
+                    icon.className = 'fas fa-times';
+                }
+            }
+        });
+        
+        // Calculate strength
+        const score = Object.values(requirements).filter(Boolean).length;
+        let strength = 'weak';
+        let strengthClass = 'strength-weak';
+        
+        if (score >= 5) {
+            strength = 'strong';
+            strengthClass = 'strength-strong';
+        } else if (score >= 4) {
+            strength = 'good';
+            strengthClass = 'strength-good';
+        } else if (score >= 2) {
+            strength = 'fair';
+            strengthClass = 'strength-fair';
+        }
+        
+        strengthText.textContent = strength.charAt(0).toUpperCase() + strength.slice(1);
+        strengthBar.className = `strength-fill ${strengthClass}`;
+        
+        return score >= 4; // At least 4 requirements met
+    }
+    
+    // Password input handler
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        if (password.length > 0) {
+            strengthDiv.style.display = 'block';
+            checkPasswordStrength(password);
+        } else {
+            strengthDiv.style.display = 'none';
+        }
+        checkFormValidity();
+    });
+    
+    // Password confirmation handler
+    password2Input.addEventListener('input', function() {
+        const password = passwordInput.value;
+        const password2 = this.value;
+        
+        if (password2.length > 0) {
+            if (password !== password2) {
+                passwordMatch.textContent = 'Passwords do not match';
+                passwordMatch.style.display = 'block';
+                this.classList.add('is-invalid');
+            } else {
+                passwordMatch.style.display = 'none';
+                this.classList.remove('is-invalid');
+            }
+        } else {
+            passwordMatch.style.display = 'none';
+            this.classList.remove('is-invalid');
+        }
+        checkFormValidity();
+    });
+    
+    // Terms checkbox handler
+    agreeTerms.addEventListener('change', checkFormValidity);
+    
+    // Form validity checker
+    function checkFormValidity() {
+        const password = passwordInput.value;
+        const password2 = password2Input.value;
+        const isPasswordStrong = password.length > 0 && checkPasswordStrength(password);
+        const isPasswordMatch = password === password2 && password2.length > 0;
+        const isTermsAgreed = agreeTerms.checked;
+        
+        if (isPasswordStrong && isPasswordMatch && isTermsAgreed) {
+            registerBtn.disabled = false;
+            registerBtn.classList.remove('btn-secondary');
+            registerBtn.classList.add('btn-primary');
+        } else {
+            registerBtn.disabled = true;
+            registerBtn.classList.add('btn-secondary');
+            registerBtn.classList.remove('btn-primary');
+        }
+        
+        updateDebugInfo();
+    }
+    
+    // Form submission handler - FIXED
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+        console.log('Form submitted');
+        
+        // Check if button is disabled
+        if (registerBtn.disabled) {
+            e.preventDefault();
+            alert('Please complete all requirements before submitting');
+            return false;
+        }
+        
+        // Change button state
+        registerBtn.disabled = true;
+        registerBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+        
+        // Allow form to submit naturally
+        return true;
+    });
+    
+    // Initial check
+    checkFormValidity();
+});
+</script>
+{% endblock %}

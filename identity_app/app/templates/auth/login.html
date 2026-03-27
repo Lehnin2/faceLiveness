@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Login - BiometricID Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        max-width: 400px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .login-header i {
+        font-size: 3rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+    
+    .form-floating {
+        margin-bottom: 1rem;
+    }
+    
+    .btn-login {
+        width: 100%;
+        padding: 0.75rem;
+        font-weight: 600;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        transition: transform 0.2s;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .divider {
+        text-align: center;
+        margin: 1.5rem 0;
+        position: relative;
+    }
+    
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #dee2e6;
+    }
+    
+    .divider span {
+        background: #fff;
+        padding: 0 1rem;
+        color: #6c757d;
+    }
+    
+    .social-login {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .social-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        background: #fff;
+        transition: all 0.3s;
+    }
+    
+    .social-btn:hover {
+        border-color: #0d6efd;
+        background: #f8f9fa;
+    }
+    
+    .register-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .security-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 1rem;
+        padding: 0.5rem;
+        background: #f8f9fa;
+        border-radius: 5px;
+        font-size: 0.875rem;
+        color: #6c757d;
+    }
+    
+    .security-badge i {
+        margin-right: 0.5rem;
+        color: #28a745;
+    }
+    
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+    
+    .navbar {
+        background: rgba(255,255,255,0.1) !important;
+        backdrop-filter: blur(10px);
+    }
+    
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block main_class %}{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-header">
+        <i class="fas fa-fingerprint"></i>
+        <h2>Welcome Back</h2>
+        <p class="text-muted">Sign in to your secure account</p>
+    </div>
+    
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        
+        <div class="form-floating">
+            {{ form.username_or_email(class="form-control", placeholder="Username") }}
+            {{ form.username_or_email.label(class="form-label") }}
+            {% if form.username_or_email.errors %}
+                <div class="error-message">
+                    {% for error in form.username_or_email.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-floating">
+            {{ form.password(class="form-control", placeholder="Password") }}
+            {{ form.password.label(class="form-label") }}
+            {% if form.password.errors %}
+                <div class="error-message">
+                    {% for error in form.password.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-check mb-3">
+            {{ form.remember_me(class="form-check-input") }}
+            {{ form.remember_me.label(class="form-check-label") }}
+        </div>
+        
+        <button type="submit" class="btn btn-primary btn-login">
+            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+        </button>
+    </form>
+    
+    <div class="divider">
+        <span>or</span>
+    </div>
+    
+    <div class="social-login">
+        <button class="social-btn" onclick="alert('Coming soon!')">
+            <i class="fab fa-google text-danger"></i>
+        </button>
+        <button class="social-btn" onclick="alert('Coming soon!')">
+            <i class="fab fa-facebook text-primary"></i>
+        </button>
+        <button class="social-btn" onclick="alert('Coming soon!')">
+            <i class="fab fa-apple text-dark"></i>
+        </button>
+    </div>
+    
+    <div class="text-center">
+        <a href="#" class="text-decoration-none">Forgot your password?</a>
+    </div>
+    
+    <div class="register-link">
+        <p class="mb-0">Don't have an account? 
+            <a href="{{ url_for('auth.register') }}" class="text-decoration-none fw-bold">Sign up now</a>
+        </p>
+    </div>
+    
+    <div class="security-badge">
+        <i class="fas fa-shield-alt"></i>
+        <span>Secured with 256-bit encryption</span>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add floating label animation
+    const inputs = document.querySelectorAll('.form-floating input');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+    });
+    
+    // Add loading state to login button
+    const loginForm = document.querySelector('form');
+    const loginBtn = document.querySelector('.btn-login');
+    
+    loginForm.addEventListener('submit', function() {
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing in...';
+    });
+});
+</script>
+{% endblock %}
