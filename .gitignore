@@ -1,0 +1,122 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+*.venv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Large Model Files
+models/
+*.pt
+*.pth
+*.h5
+*.ckpt
+*.pb
+*.onnx
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+users.db
+
+# IDE Settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+
+# OS files
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Documentation files
+# Microsoft Office
+*.docx
+*.doc
+*.pptx
+*.ppt
+*.pptm
+*.potx
+*.pot
+*.ppsx
+*.pps
+*.xlsx
+*.xls
+
+# Document generation temp files
+*.pdf
+
+# Environment file
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*~
+.~*
+
+# Static files (user uploads/temp)
+static/faces/
+
+# Node modules (if any frontend)
+node_modules/
+npm-debug.log
+
+# Any compiled Python files in specific directories
+static/**/*.pyc
+templates/**/*.pyc
+
+# Cache directories
+.cache/
+*.cache
+
+# API Keys and sensitive
+config/secrets.json
+secrets.json
+.secrets

@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureID - Biometric Authentication</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .auth-section {
+            display: none;
+        }
+
+        .auth-section.active {
+            display: block;
+        }
+
+        /* Landing Page Styles */
+        .landing-hero {
+            margin-bottom: 40px;
+        }
+
+        .landing-hero h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .landing-hero p {
+            font-size: 1.1em;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .switch-auth {
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .switch-auth a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .switch-auth a:hover {
+            text-decoration: underline;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            text-align: left;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .dashboard-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .user-info {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .user-info h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .user-info p {
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .services-section {
+            margin-top: 30px;
+        }
+
+        .services-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .service-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-card:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .service-card h4 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .service-card p {
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Video Styles */
+        .video-container {
+            position: relative;
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        #video, #liveness-video {
+            width: 100%;
+            height: 540px;
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .challenge-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .face-capture {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+        /* Document Upload Styles */
+.upload-zone {
+    border: 3px dashed #667eea;
+    border-radius: 15px;
+    padding: 40px 20px;
+    text-align: center;
+    background: rgba(102, 126, 234, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin: 20px 0;
+}
+
+.upload-zone:hover {
+    border-color: #764ba2;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.upload-zone.dragover {
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.upload-icon {
+    font-size: 4em;
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.camera-preview {
+    position: relative;
+    margin: 20px 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.document-preview {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.ocr-results {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: left;
+}
+
+.extracted-field {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.extracted-field:last-child {
+    border-bottom: none;
+}
+
+.field-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.field-value {
+    color: #28a745;
+    font-family: monospace;
+}
+.error-display {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.error-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 400px;
+    text-align: center;
+}
+
+.error-actions {
+    margin-top: 20px;
+}
+
+.error-actions button {
+    margin: 0 10px;
+}
+
+.hidden {
+    display: none !important;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Landing Page -->
+        <div id="landing-section" class="auth-section active">
+            <div class="logo">🔐 SecureID</div>
+            <div class="subtitle">Advanced Biometric Civil Identity Platform</div>
+            
+            <div class="landing-hero">
+                <h1>Secure Your Digital Identity</h1>
+                <p>Experience the future of civil identity verification with our cutting-edge biometric platform. 
+                   Secure, fast, and intelligent document processing powered by AI and advanced biometric technology.</p>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Liveness Detection</h3>
+                    <p>Advanced anti-spoofing technology that prevents fraud using photos or videos, ensuring only real people can access the system.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👁️</div>
+                    <h3>Biometric Matching</h3>
+                    <p>Secure facial recognition and fingerprint verification powered by state-of-the-art AI algorithms.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📄</div>
+                    <h3>Document Digitization</h3>
+                    <p>Intelligent AI extraction and processing of official documents with step-by-step guidance.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Smart Assistant</h3>
+                    <p>AI-powered chatbot provides personalized guidance through every step of the identity verification process.</p>
+                </div>
+            </div>
+
+            <div class="cta-buttons">
+                <button class="btn btn-primary" onclick="showSection('login-section')">Login</button>
+                <button class="btn btn-secondary" onclick="showSection('register-section')">Register</button>
+            </div>
+        </div>
+
+        <!-- Login Section -->
+        <div id="login-section" class="auth-section">
+            <button class="back-btn" onclick="showSection('landing-section')">← Back to Home</button>
+            <h2>Login to SecureID</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary form-btn">Login</button>
+            </form>
+            <div class="switch-auth">
+                Don't have an account? <a href="#" onclick="showSection('register-section')">Register here</a>
+            </div>
+        </div>
+
+        <!-- Register Section -->
+        <div id="register-section" class="auth-section">
+            <button class="back-btn" onclick="showSection('landing-section')">← Back to Home</button>
+            <h2>Create Your SecureID Account</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email</label>
+                    <input type="email" id="reg-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-confirm-password">Confirm Password</label>
+                    <input type="password" id="reg-confirm-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary form-btn">Register</button>
+            </form>
+            <div class="switch-auth">
+                Already have an account? <a href="#" onclick="showSection('login-section')">Login here</a>
+            </div>
+        </div>
+
+        <!-- Face Capture Section -->
+        <div id="face-capture-section" class="auth-section">
+            <h2>Biometric Registration</h2>
+            <p>Please capture your face for secure biometric authentication</p>
+            <div class="face-capture">
+                <video id="video" autoplay muted></video>
+                <div id="video-overlay" class="video-overlay">
+                    <div>
+                        <div class="loader"></div>
+                        <p>Starting camera...</p>
+                    </div>
+                </div>
+            </div>
+            <button id="capture-btn" class="btn btn-primary" style="display: none;">Capture Face</button>
+            <button id="retake-btn" class="btn btn-secondary hidden">Retake</button>
+            <button id="save-face-btn" class="btn btn-primary hidden">Save & Complete Registration</button>
+            <!-- Add this error display div to your face-capture-section -->
+<div id="face-error-display" class="error-display hidden">
+    <div class="error-content">
+        <h3>⚠️ Registration Issue</h3>
+        <p id="face-error-message"></p>
+        <div class="error-actions">
+            <button onclick="hideFaceError()" class="btn btn-secondary">Try Again</button>
+            <button onclick="showSection('login-section')" class="btn btn-primary">Go to Login</button>
+        </div>
+    </div>
+</div>
+        </div>
+
+        <!-- Liveness Detection Section -->
+        <div id="liveness-section" class="auth-section">
+            <h2>Biometric Verification</h2>
+            <p>Please complete the liveness challenge to verify your identity</p>
+            <div class="challenge-text" id="challenge-text">
+                Looking for face...
+            </div>
+            <div class="video-container">
+                <video id="liveness-video" autoplay muted></video>
+                <div id="liveness-overlay" class="video-overlay">
+                    <div>
+                        <div class="loader"></div>
+                        <p>Initializing liveness detection...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div id="status-message" class="status-message hidden"></div>
+            <!-- Add this button to your liveness section HTML -->
+<button id="voiceToggle" onclick="toggleVoice()" class="btn btn-secondary" style="margin: 10px;">
+    🔊 Voice On
+</button>
+        </div>
+        
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="auth-section dashboard">
+            <div class="dashboard-header">
+                <div>
+                    <h2>SecureID Dashboard</h2>
+                    <p>Welcome back! Access your civil identity services below.</p>
+                </div>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+            </div>
+
+            <div class="user-info">
+                <h3>👤 Account Information</h3>
+                <p><strong>Username:</strong> <span id="dashboard-username">-</span></p>
+                <p><strong>Email:</strong> <span id="dashboard-email">-</span></p>
+                <p><strong>Last Login:</strong> <span id="dashboard-last-login">-</span></p>
+                <p><strong>Account Status:</strong> <span style="color: #28a745; font-weight: bold;">✅ Verified</span></p>
+            </div>
+            
+            <div class="services-section">
+                <h3>📋 Civil Identity Services</h3>
+                <p>Select a service to request or extract your documents</p>
+                
+                <div class="services-grid">
+                    <div class="service-card" onclick="requestDocument('birth-certificate')">
+                        <div class="service-icon">📜</div>
+                        <h4>Birth Certificate</h4>
+                        <p>Request or extract your official birth certificate with AI-powered document processing</p>
+                    </div>
+                    <div class="service-card" onclick="requestDocument('marriage-certificate')">
+                        <div class="service-icon">💍</div>
+                        <h4>Marriage Certificate</h4>
+                        <p>Process marriage certificates with secure biometric verification</p>
+                    </div>
+                    <div class="service-card" onclick="requestDocument('identity-card')">
+                        <div class="service-icon">🆔</div>
+                        <h4>Identity Card</h4>
+                        <p>Request new identity cards or update existing information</p>
+                    </div>
+                    <div class="service-card" onclick="requestDocument('passport')">
+                        <div class="service-icon">📕</div>
+                        <h4>Passport Services</h4>
+                        <p>Apply for new passport or renewal with biometric authentication</p>
+                    </div>
+                    <div class="service-card" onclick="requestDocument('extract-documents')">
+                        <div class="service-icon">🔍</div>
+                        <h4>Document Extraction</h4>
+                        <p>AI-powered extraction and digitization of existing documents</p>
+                    </div>
+                    <div class="service-card" onclick="requestDocument('verification-history')">
+                        <div class="service-icon">📊</div>
+                        <h4>Verification History</h4>
+                        <p>View your biometric verification history and security logs</p>
+                    </div>
+                    <!-- Add this to your services-grid in the dashboard -->
+<div class="service-card" onclick="openDocumentGenerator()">
+    <div class="service-icon">📝</div>
+    <h4>Generate Documents</h4>
+    <p>AI-powered document generation for certificates and ID cards</p>
+</div>
+                </div>
+            </div>
+            
+
+        </div>
+        <!-- Add this after your existing sections -->
+<div id="document-generator-section" class="auth-section">
+    <button class="back-btn" onclick="showSection('dashboard-section')">← Back to Dashboard</button>
+    <iframe id="document-generator-frame" src="document-generator.html" style="width: 100%; height: 800px; border: none; border-radius: 12px;"></iframe>
+</div>
+        <!-- Document Processing Section -->
+<div id="document-section" class="auth-section">
+    <button class="back-btn" onclick="showSection('dashboard-section')">← Back to Dashboard</button>
+    <h2>📄 Document Processing</h2>
+    <p>Upload or capture your documents for AI-powered extraction and processing</p>
+    
+    <div class="upload-methods">
+        <div class="upload-zone" id="upload-zone">
+            <div class="upload-icon">📁</div>
+            <h3>Drop your document here</h3>
+            <p>or click to browse files</p>
+            <input type="file" id="file-input" accept="image/*,.pdf" style="display: none;">
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <strong>OR</strong>
+        </div>
+        
+        <button class="btn btn-secondary" id="camera-capture-btn">📷 Take Photo with Camera</button>
+    </div>
+    
+    <!-- Camera Capture -->
+    <div id="camera-section" class="hidden">
+        <div class="camera-preview">
+            <video id="document-video" autoplay muted style="width: 100%; height: 400px; object-fit: cover;"></video>
+            <div id="document-overlay" class="video-overlay hidden">
+                <div>
+                    <div class="loader"></div>
+                    <p>Starting camera...</p>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center; margin: 20px 0;">
+            <button id="capture-document-btn" class="btn btn-primary hidden">📸 Capture Document</button>
+            <button id="cancel-camera-btn" class="btn btn-secondary">❌ Cancel</button>
+        </div>
+    </div>
+    
+    <!-- Document Preview -->
+    <div id="preview-section" class="hidden">
+        <h3>Document Preview</h3>
+        <div id="document-preview-container"></div>
+        <div style="text-align: center; margin: 20px 0;">
+            <button id="process-document-btn" class="btn btn-primary">🔍 Extract Information</button>
+            <button id="retake-document-btn" class="btn btn-secondary">🔄 Retake</button>
+        </div>
+    </div>
+    
+    <!-- OCR Results -->
+    <div id="ocr-section" class="hidden">
+        <h3>Extracted Information</h3>
+        <div id="ocr-results" class="ocr-results">
+            <div class="loader" id="processing-loader"></div>
+            <p id="processing-text">Processing document with AI...</p>
+        </div>
+        <div style="text-align: center; margin: 20px 0;">
+            <button id="save-extracted-btn" class="btn btn-primary hidden">💾 Save Information</button>
+            <button id="process-another-btn" class="btn btn-secondary hidden">📄 Process Another Document</button>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let currentStep = 'landing';
+        let video = null;
+        let stream = null;
+        let capturedFace = null;
+        let livenessChallenge = null;
+        let challengeStartTime = null;
+        let livenessVideo = null;
+        let livenessStream = null;
+        let documentStream = null;
+        let capturedDocument = null;
+        let currentDocumentType = null;
+        // Add these to your existing global variables
+        let voiceEnabled = true;
+        let lastSpokenChallenge = null;
+        let returnCenterSpoken = false;
+        let successSpoken = false;
+        let failedSpoken = false;
+        // Navigation functions
+        function showSection(sectionId) {
+            document.querySelectorAll('.auth-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            currentStep = sectionId.replace('-section', '');
+        }
+function toggleVoice() {
+    voiceEnabled = !voiceEnabled;
+    if (!voiceEnabled) {
+        speechSynthesis.cancel(); // Stop any ongoing speech
+    }
+    
+    // Update UI button text
+    const voiceButton = document.getElementById('voiceToggle');
+    if (voiceButton) {
+        voiceButton.textContent = voiceEnabled ? '🔊 Voice On' : '🔇 Voice Off';
+    }
+}
+function showFaceError(message) {
+    document.getElementById('face-error-message').textContent = message;
+    document.getElementById('face-error-display').classList.remove('hidden');
+}
+
+function hideFaceError() {
+    document.getElementById('face-error-display').classList.add('hidden');
+}
+// Add this after your global variables
+function speakInstruction(text) {
+    if (!voiceEnabled) return;
+    
+    if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.8;
+        utterance.pitch = 1.0;
+        utterance.volume = 0.9;
+        
+        const voices = speechSynthesis.getVoices();
+        const femaleVoice = voices.find(voice => 
+            voice.name.toLowerCase().includes('female') || 
+            voice.name.toLowerCase().includes('zira') ||
+            voice.name.toLowerCase().includes('samantha')
+        );
+        if (femaleVoice) {
+            utterance.voice = femaleVoice;
+        }
+        
+        speechSynthesis.speak(utterance);
+        console.log(`🔊 Speaking: "${text}"`);
+    }
+}
+// Add these functions to your existing script
+function openDocumentGenerator() {
+    showSection('document-generator-section');
+    
+    // Pass user's face photo to the generator
+    setTimeout(() => {
+        const iframe = document.getElementById('document-generator-frame');
+        if (iframe.contentWindow && iframe.contentWindow.documentGenerator) {
+            // Get user's face from registration or from backend
+            getUserFacePhoto().then(faceData => {
+                if (faceData) {
+                    iframe.contentWindow.documentGenerator.setUserPhoto(faceData);
+                }
+            });
+        }
+    }, 1000);
+}
+
+
+// Updated frontend function to work with the backend endpoint
+async function getUserFacePhoto() {
+    try {
+        console.log('🔍 Fetching user face photo...');
+        
+        // Make sure we have auth headers function
+        const authHeaders = getAuthHeaders();
+        if (!authHeaders.Authorization) {
+            console.error('❌ No authentication token found');
+            return null;
+        }
+        
+        const response = await fetch('/api/user/face-photo', {
+            method: 'GET',
+            headers: authHeaders
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            
+            if (data.face_photo) {
+                console.log('✅ Face photo retrieved successfully');
+                return data.face_photo; // Returns base64 data URL
+            } else {
+                console.log('ℹ️ No face photo registered for user');
+                return null;
+            }
+        } else {
+            const errorData = await response.json();
+            console.error('❌ Failed to get face photo:', errorData.error || response.statusText);
+            
+            // Handle specific error cases
+            if (response.status === 401) {
+                console.error('Authentication failed - user may need to log in again');
+                // Optionally redirect to login or refresh token
+            } else if (response.status === 404) {
+                console.log('User or face photo not found');
+            }
+            
+            return null;
+        }
+        
+    } catch (error) {
+        console.error('❌ Network error getting user face photo:', error);
+        return null;
+    }
+}
+
+// Helper function to ensure auth headers are properly formatted
+function getAuthHeaders() {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    
+    if (!token) {
+        console.warn('⚠️ No authentication token found');
+        return {};
+    }
+    
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+}
+
+        // FIXED Registration process - removed localStorage usage
+document.getElementById('register-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('reg-username').value;
+    const email = document.getElementById('reg-email').value;
+    const password = document.getElementById('reg-password').value;
+    const confirmPassword = document.getElementById('reg-confirm-password').value;
+
+    if (password !== confirmPassword) {
+        alert('Passwords do not match!');
+        return;
+    }
+
+    // Store ONLY for current session - NOT in localStorage
+    currentUser = {
+        username: username,
+        email: email,
+        password: password,
+        face: null,
+        registrationDate: new Date().toISOString()
+    };
+
+    // Move to face capture
+    showSection('face-capture-section');
+    startFaceCapture();
+});
+
+        // Face capture functions
+        function startFaceCapture() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById('video-overlay').innerHTML = '<p>Camera access not supported in this browser.</p>';
+        return;
+    }
+
+            video = document.getElementById('video');
+            
+            navigator.mediaDevices.getUserMedia({ 
+    video: { 
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: 'user'
+    } 
+})
+                .then(function(mediaStream) {
+                    stream = mediaStream;
+                    video.srcObject = stream;
+                    document.getElementById('video-overlay').style.display = 'none';
+                    document.getElementById('capture-btn').style.display = 'block';
+                })
+                .catch(function(error) {
+    console.error('Error accessing camera:', error);
+    let errorMessage = 'Error accessing camera. ';
+    
+    if (error.name === 'NotAllowedError') {
+        errorMessage += 'Please allow camera access and refresh the page.';
+    } else if (error.name === 'NotFoundError') {
+        errorMessage += 'No camera found on this device.';
+    } else if (error.name === 'NotReadableError') {
+        errorMessage += 'Camera is being used by another application.';
+    } else {
+        errorMessage += 'Please ensure camera permissions are granted and try again.';
+    }
+    
+    document.getElementById('video-overlay').innerHTML = `<p>${errorMessage}</p><button onclick="startFaceCapture()" class="btn btn-primary" style="margin-top: 10px;">Try Again</button>`;
+});
+        }
+
+        document.getElementById('capture-btn').addEventListener('click', function() {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            capturedFace = canvas.toDataURL('image/jpeg');
+            
+            // Show captured image
+            video.style.display = 'none';
+            const img = document.createElement('img');
+            img.src = capturedFace;
+            img.style.width = '100%';
+            img.style.height = '300px';
+            img.style.objectFit = 'cover';
+            video.parentNode.appendChild(img);
+            
+            // Show controls
+            document.getElementById('capture-btn').style.display = 'none';
+            document.getElementById('retake-btn').classList.remove('hidden');
+            document.getElementById('save-face-btn').classList.remove('hidden');
+        });
+
+        document.getElementById('save-face-btn').addEventListener('click', async function() {
+    if (!capturedFace) {
+        alert('Please capture your face first!');
+        return;
+    }
+
+    if (!currentUser || !currentUser.username || !currentUser.email || !currentUser.password) {
+        alert('Registration data missing. Please start over.');
+        showSection('register-section');
+        return;
+    }
+
+    // Show loading state
+    const saveBtn = this;
+    const originalText = saveBtn.textContent;
+    saveBtn.textContent = 'Processing...';
+    saveBtn.disabled = true;
+
+    try {
+        const response = await fetch('/api/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: currentUser.username,
+                email: currentUser.email,
+                password: currentUser.password,
+                face_encoding: capturedFace
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Stop camera stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            
+            // Clear current user data (it's now saved in database)
+            currentUser = null;
+            capturedFace = null;
+            
+            alert('✅ Registration completed successfully! Your account has been created. You can now login.');
+            showSection('login-section');
+        } else {
+            // Handle different error types
+            if (result.error_type === 'duplicate_face') {
+    showFaceError('This face is already associated with another account. Each person can only register once. If this is your face and you forgot your username, please contact support.');
+} else {
+    showFaceError('Registration failed: ' + (result.error || 'Unknown error'));
+}
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        alert('❌ Registration failed. Please check your connection and try again.');
+    } finally {
+        // Reset button state
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
+    }
+});
+
+
+        // Login process
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+
+    // Add loading state
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Logging in...';
+    submitBtn.disabled = true;
+
+    try {
+        const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            // Set current user (from database, not localStorage)
+            currentUser = { 
+                username: username,
+                hasFace: result.has_face
+            };
+            
+            // Store only the auth token for API calls
+            if (result.token) {
+        localStorage.setItem('authToken', result.token);
+        console.log('Token stored:', result.token);  // Debug log
+    }
+            
+            showSection('liveness-section');
+            startLivenessDetection();
+        } else {
+            if (response.status === 400) {
+                alert('❌ Please enter both username and password');
+            } else if (response.status === 401) {
+                alert('❌ Invalid username or password');
+            } else {
+                alert('❌ ' + (result.error || 'Login failed'));
+            }
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('❌ Network error. Please check your connection and try again.');
+    } finally {
+        // Reset button state
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+});
+
+
+        // Liveness detection functions
+function startLivenessDetection() {
+    livenessVideo = document.getElementById('liveness-video');
+    // Remove this line - let the backend handle challenge selection
+    // livenessChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+    challengeStartTime = Date.now();
+    
+    // Remove this line - we'll update challenge text from backend response
+    // updateChallengeText();
+    // ADD THIS: Reset voice flags and announce start
+    lastSpokenChallenge = null;
+    returnCenterSpoken = false;
+    successSpoken = false;
+    failedSpoken = false;
+    
+    // Announce the start
+    speakInstruction('Starting face verification. Please look at the camera');
+    navigator.mediaDevices.getUserMedia({ 
+        video: { 
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+            facingMode: 'user'
+        } 
+    })
+    .then(function(mediaStream) {
+        livenessStream = mediaStream;
+        livenessVideo.srcObject = mediaStream;
+        document.getElementById('liveness-overlay').style.display = 'none';
+        
+        // Wait for video to be ready before starting liveness
+        livenessVideo.addEventListener('loadedmetadata', function() {
+            fetch('/api/start-liveness', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                }
+            })
+            .then(response => {
+                console.log('Start liveness response:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Liveness started:', data);
+                performRealLivenessChallenge();
+            })
+            .catch(error => {
+                console.error('Failed to start liveness:', error);
+                const statusMessage = document.getElementById('status-message');
+                statusMessage.textContent = '❌ Failed to start liveness detection. Please try again.';
+                statusMessage.className = 'status-message status-error';
+            });
+        });
+    })
+    .catch(function(error) {
+        console.error('Error accessing camera:', error);
+        let errorMessage = 'Error accessing camera. ';
+        
+        if (error.name === 'NotAllowedError') {
+            errorMessage += 'Please allow camera access and refresh the page.';
+        } else if (error.name === 'NotFoundError') {
+            errorMessage += 'No camera found on this device.';
+        } else if (error.name === 'NotReadableError') {
+            errorMessage += 'Camera is being used by another application.';
+        } else {
+            errorMessage += 'Please ensure camera permissions are granted and try again.';
+        }
+        
+        document.getElementById('liveness-overlay').innerHTML = `<p>${errorMessage}</p><button onclick="startLivenessDetection()" class="btn btn-primary" style="margin-top: 10px;">Try Again</button>`;
+    });
+}
+
+        function updateChallengeText() {
+            const challengeText = document.getElementById('challenge-text');
+            const challengeMap = {
+                'blink': '👁️ Please blink your eyes',
+                'look_left': '👈 Look to your left',
+                'look_right': '👉 Look to your right',
+                'smile': '😊 Please smile'
+            };
+            challengeText.textContent = challengeMap[livenessChallenge];
+        }
+
+        function performRealLivenessChallenge() {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    let isProcessing = false; // Add flag to prevent multiple simultaneous requests
+    
+    const sendFrame = () => {
+        // Prevent multiple simultaneous requests
+        if (isProcessing) {
+            setTimeout(sendFrame, 100);
+            return;
+        }
+        
+        // Check if video is ready
+        if (livenessVideo.videoWidth === 0 || livenessVideo.videoHeight === 0) {
+            setTimeout(sendFrame, 100);
+            return;
+        }
+        
+        isProcessing = true;
+        canvas.width = livenessVideo.videoWidth;
+        canvas.height = livenessVideo.videoHeight;
+        ctx.drawImage(livenessVideo, 0, 0);
+        
+        const frameData = canvas.toDataURL('image/jpeg');
+        
+        fetch('/api/check-liveness', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            },
+            body: JSON.stringify({ frame: frameData })
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+    console.log('Liveness response:', data);
+    console.log('AI Status:', data.ai_status);
+    
+    const statusMessage = document.getElementById('status-message');
+    const progressFill = document.getElementById('progress-fill');
+    const challengeText = document.getElementById('challenge-text');
+    
+    if (data.session_data) {
+        // Update status message
+        statusMessage.textContent = data.session_data.message;
+        statusMessage.className = 'status-message'; // Reset class
+        
+        // Handle different statuses
+        if (data.session_data.status === 'calibrating') {
+            // During calibration, show progress
+            progressFill.style.width = (data.session_data.calibration_progress * 100) + '%';
+            challengeText.textContent = 'Calibrating... Look straight ahead';
+            
+        } else if (data.session_data.status === 'challenging') {
+            // Challenge phase - show full progress bar and challenge instruction
+            progressFill.style.width = '100%';
+            const challengeMap = {
+                'blink': '👁️ Please blink your eyes',
+                'look_left': '👈 Look to your left', 
+                'look_right': '👉 Look to your right',
+                'smile': '😊 Please smile'
+            };
+            challengeText.textContent = challengeMap[data.session_data.challenge] || `Please ${data.session_data.challenge.replace('_', ' ')}`;
+            
+            // ADD THIS: Voice announcement for challenges
+            let voiceInstruction = '';
+            switch (data.session_data.challenge) {
+                case 'blink':
+                    voiceInstruction = 'Please blink your eyes now';
+                    break;
+                case 'look_left':
+                    voiceInstruction = 'Please look to your left';
+                    break;
+                case 'look_right':
+                    voiceInstruction = 'Please look to your right';
+                    break;
+                case 'smile':
+                    voiceInstruction = 'Please smile';
+                    break;
+            }
+            
+            // Only speak if this is a new challenge (prevent repeated announcements)
+            if (voiceInstruction && lastSpokenChallenge !== voiceInstruction) {
+                speakInstruction(voiceInstruction);
+                lastSpokenChallenge = voiceInstruction;
+            }
+            
+        } else if (data.session_data.status === 'return_center') {
+            // ADD THIS: Voice feedback for return to center
+            if (!returnCenterSpoken) {
+                speakInstruction('Great! Now look straight ahead for face verification');
+                returnCenterSpoken = true;
+            }
+            
+        } else if (data.session_data.status === 'success') {
+            // Success cases
+            if (data.login_success) {
+                statusMessage.textContent = '🎉 Face matched successfully! Welcome!';
+                statusMessage.className = 'status-message status-success';
+                challengeText.textContent = 'Verification Complete!';
+                
+                // ADD THIS: Voice announcement for success
+                if (!successSpoken) {
+                    speakInstruction('Verification successful! Welcome back');
+                    successSpoken = true;
+                }
+                
+                // Stop the liveness detection and proceed to dashboard
+                if (livenessStream) {
+                    livenessStream.getTracks().forEach(track => track.stop());
+                }
+                
+                setTimeout(() => {
+                    loginUser();
+                }, 2000);
+                return; // Don't continue the loop
+                
+            } else if (data.face_match === false) {
+                statusMessage.textContent = `❌ Face verification failed (confidence: ${(data.confidence * 100).toFixed(1)}%)`;
+                statusMessage.className = 'status-message status-error';
+                challengeText.textContent = 'Verification Failed';
+                
+                // ADD THIS: Voice announcement for face match failure
+                if (!failedSpoken) {
+                    speakInstruction('Face verification failed. Please try again');
+                    failedSpoken = true;
+                }
+                return; // Don't continue the loop
+            }
+            
+        } else if (data.session_data.status === 'failed') {
+            // Failed cases
+            statusMessage.textContent = '❌ ' + data.session_data.message;
+            statusMessage.className = 'status-message status-error';
+            challengeText.textContent = 'Verification Failed';
+            
+            // ADD THIS: Voice announcement for general failure
+            if (!failedSpoken) {
+                speakInstruction('Verification failed. Please try again');
+                failedSpoken = true;
+            }
+            
+            // Show retry button after a delay
+            setTimeout(() => {
+                statusMessage.innerHTML = '❌ ' + data.session_data.message + 
+                    '<br><button onclick="restartLiveness()" class="btn btn-primary" style="margin-top: 10px;">Try Again</button>';
+            }, 2000);
+            return; // Don't continue the loop
+        }
+        
+        // Handle AI anti-spoofing detection
+        if (data.ai_status === 'spoof_detected') {
+            statusMessage.textContent = '❌ Spoofing detected. Please use live camera feed.';
+            statusMessage.className = 'status-message status-error';
+            challengeText.textContent = 'Spoofing Detected';
+            
+            // ADD THIS: Voice announcement for spoofing detection
+            speakInstruction('Spoofing detected. Please use a live camera feed');
+            return; // Don't continue the loop
+        }
+    }
+    
+    // Continue processing if we haven't returned yet
+    isProcessing = false;
+    setTimeout(sendFrame, 200); // Reduced frequency to 200ms for better performance
+    
+})
+        .catch(error => {
+            console.error('Liveness check error:', error);
+            isProcessing = false;
+            
+            // Show error and retry option
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.textContent = '❌ Connection error. Please check your internet connection.';
+            statusMessage.className = 'status-message status-error';
+            
+            setTimeout(() => {
+                statusMessage.innerHTML = '❌ Connection error. Please check your internet connection.' + 
+                    '<br><button onclick="restartLiveness()" class="btn btn-primary" style="margin-top: 10px;">Try Again</button>';
+            }, 2000);
+        });
+    };
+    
+    // Start the process
+    sendFrame();
+}
+// Add restart function
+function restartLiveness() {
+    // Stop current stream
+    if (livenessStream) {
+        livenessStream.getTracks().forEach(track => track.stop());
+    }
+    
+    // Reset UI
+    document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('status-message').textContent = '';
+    document.getElementById('status-message').className = 'status-message hidden';
+    document.getElementById('challenge-text').textContent = 'Looking for face...';
+    
+    // Restart detection
+    startLivenessDetection();
+}
+
+
+        function loginUser() {
+    showSection('dashboard-section');
+    updateDashboard();
+}
+
+        async function updateDashboard() {
+    try {
+        const response = await fetch('/api/user/profile', {
+            method: 'GET',
+            headers: getAuthHeaders()
+        });
+
+        if (response.ok) {
+            const userData = await response.json();
+            document.getElementById('dashboard-username').textContent = userData.username;
+            document.getElementById('dashboard-email').textContent = userData.email;
+            document.getElementById('dashboard-last-login').textContent = 
+                new Date(userData.last_login).toLocaleString();
+        } else {
+            // Fallback to current session data
+            document.getElementById('dashboard-username').textContent = currentUser.username;
+            document.getElementById('dashboard-email').textContent = 'Email not available';
+            document.getElementById('dashboard-last-login').textContent = 'Just now';
+        }
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        // Fallback to current session data
+        document.getElementById('dashboard-username').textContent = currentUser.username;
+        document.getElementById('dashboard-email').textContent = 'Email not available';
+        document.getElementById('dashboard-last-login').textContent = 'Just now';
+    }
+}
+
+        // Update your requestDocument function
+function requestDocument(docType) {
+    currentDocumentType = docType;
+    if (docType === 'extract-documents') {
+        showSection('document-section');
+        initializeDocumentProcessing();
+    } else if (docType === 'generate-documents') {
+        openDocumentGenerator();
+    } else {
+            const docNames = {
+                'birth-certificate': 'Birth Certificate',
+                'marriage-certificate': 'Marriage Certificate',
+                'identity-card': 'Identity Card',
+                'passport': 'Passport',
+                'extract-documents': 'Document Extraction',
+                'verification-history': 'Verification History'
+            };
+            
+            const messages = {
+                'birth-certificate': 'Birth Certificate request submitted! Our AI will process your request and you\'ll receive email confirmation shortly.',
+                'marriage-certificate': 'Marriage Certificate request submitted! Document processing will begin immediately.',
+                'identity-card': 'Identity Card request submitted! Your new ID will be processed within 3-5 business days.',
+                'passport': 'Passport application submitted! Processing time is 2-3 weeks for standard service.',
+                'extract-documents': 'Document extraction service initiated! Our AI will analyze and digitize your documents.',
+                'verification-history': 'Verification history accessed! View your complete biometric authentication log.'
+            };
+            
+            alert(`📋 ${docNames[docType]}\n\n${messages[docType]}`);
+            
+            // Simulate document processing
+            setTimeout(() => {
+                const notification = document.createElement('div');
+                notification.className = 'status-message status-success';
+                notification.textContent = `✅ ${docNames[docType]} processing has begun. Check your email for updates.`;
+                notification.style.position = 'fixed';
+                notification.style.top = '20px';
+                notification.style.right = '20px';
+                notification.style.zIndex = '1000';
+                notification.style.maxWidth = '300px';
+                notification.style.animation = 'slideIn 0.3s ease-out';
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 4000);
+            }, 1000);
+        }
+    }
+// Document processing functions
+function initializeDocumentProcessing() {
+    const uploadZone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('file-input');
+    const cameraBtn = document.getElementById('camera-capture-btn');
+    
+    // File upload handlers
+    uploadZone.addEventListener('click', () => fileInput.click());
+    uploadZone.addEventListener('dragover', handleDragOver);
+    uploadZone.addEventListener('drop', handleFileDrop);
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    // Camera handlers
+    cameraBtn.addEventListener('click', startDocumentCamera);
+    document.getElementById('cancel-camera-btn').addEventListener('click', cancelCamera);
+    document.getElementById('capture-document-btn').addEventListener('click', captureDocument);
+    document.getElementById('retake-document-btn').addEventListener('click', retakeDocument);
+    document.getElementById('process-document-btn').addEventListener('click', processDocument);
+    document.getElementById('process-another-btn').addEventListener('click', processAnother);
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('dragover');
+}
+
+function handleFileDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleFile(files[0]);
+    }
+}
+
+function handleFileSelect(e) {
+    if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+    }
+}
+
+function handleFile(file) {
+    if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+        alert('Please select an image or PDF file');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        showDocumentPreview(e.target.result, file.type);
+    };
+    reader.readAsDataURL(file);
+}
+
+function startDocumentCamera() {
+    document.getElementById('camera-section').classList.remove('hidden');
+    const video = document.getElementById('document-video');
+    
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' } // Use back camera if available
+    })
+    .then(stream => {
+        documentStream = stream;
+        video.srcObject = stream;
+        document.getElementById('capture-document-btn').classList.remove('hidden');
+    })
+    .catch(error => {
+        console.error('Camera error:', error);
+        alert('Error accessing camera. Please try file upload instead.');
+    });
+}
+
+function cancelCamera() {
+    if (documentStream) {
+        documentStream.getTracks().forEach(track => track.stop());
+        documentStream = null;
+    }
+    document.getElementById('camera-section').classList.add('hidden');
+    document.getElementById('capture-document-btn').classList.add('hidden');
+}
+
+function captureDocument() {
+    const video = document.getElementById('document-video');
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    
+    capturedDocument = canvas.toDataURL('image/jpeg');
+    
+    // Stop camera
+    if (documentStream) {
+        documentStream.getTracks().forEach(track => track.stop());
+        documentStream = null;
+    }
+    
+    document.getElementById('camera-section').classList.add('hidden');
+    showDocumentPreview(capturedDocument, 'image/jpeg');
+}
+
+function showDocumentPreview(dataUrl, fileType) {
+    const container = document.getElementById('document-preview-container');
+    container.innerHTML = '';
+    
+    if (fileType.startsWith('image/')) {
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.className = 'document-preview';
+        container.appendChild(img);
+    } else if (fileType === 'application/pdf') {
+        const embed = document.createElement('embed');
+        embed.src = dataUrl;
+        embed.type = 'application/pdf';
+        embed.style.width = '100%';
+        embed.style.height = '400px';
+        container.appendChild(embed);
+    }
+    
+    capturedDocument = dataUrl;
+    document.getElementById('preview-section').classList.remove('hidden');
+    document.getElementById('ocr-section').classList.add('hidden');
+}
+
+function retakeDocument() {
+    document.getElementById('preview-section').classList.add('hidden');
+    document.getElementById('ocr-section').classList.add('hidden');
+    capturedDocument = null;
+}
+
+// Improved processDocument function with better error handling
+async function processDocument() {
+    if (!capturedDocument) {
+        alert('No document to process');
+        return;
+    }
+    
+    // Check if required elements exist
+    const ocrSection = document.getElementById('ocr-section');
+    const processingLoader = document.getElementById('processing-loader');
+    const processingText = document.getElementById('processing-text');
+    
+    if (!ocrSection || !processingLoader || !processingText) {
+        console.error('Required UI elements not found');
+        alert('Error: Missing UI elements. Please refresh the page.');
+        return;
+    }
+    
+    ocrSection.classList.remove('hidden');
+    processingLoader.style.display = 'block';
+    processingText.textContent = 'Processing document with AI...';
+    processingText.style.color = ''; // Reset color
+    
+    try {
+        const response = await fetch('/api/process-document', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                ...getAuthHeaders()
+            },
+            body: JSON.stringify({
+                image: capturedDocument,
+                document_type: currentDocumentType || 'generic'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            displayOCRResults(result.extracted_data, result.raw_text);
+        } else {
+            throw new Error(result.error || 'Processing failed');
+        }
+    } catch (error) {
+        console.error('OCR processing error:', error);
+        processingText.textContent = 'Error processing document. Please try again.';
+        processingText.style.color = '#dc3545';
+    } finally {
+        processingLoader.style.display = 'none';
+    }
+}
+
+
+// Improved displayOCRResults function
+function displayOCRResults(extractedData, rawText) {
+    const resultsContainer = document.getElementById('ocr-results');
+    if (!resultsContainer) {
+        console.error('OCR results container not found');
+        return;
+    }
+    
+    resultsContainer.innerHTML = '';
+    
+    // Show raw text for debugging
+    if (rawText && rawText.trim()) {
+        const rawTextDiv = document.createElement('div');
+        rawTextDiv.className = 'raw-text-section';
+        rawTextDiv.innerHTML = `
+            <h4>Raw Text Extracted:</h4>
+            <div class="raw-text-content" style="background: #f5f5f5; padding: 10px; border-radius: 4px; margin: 10px 0; max-height: 200px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; font-size: 12px;">${rawText}</div>
+        `;
+        resultsContainer.appendChild(rawTextDiv);
+    }
+    
+    // Show extracted fields
+    if (extractedData && Object.keys(extractedData).length > 0) {
+        const fieldsDiv = document.createElement('div');
+        fieldsDiv.innerHTML = '<h4>Extracted Fields:</h4>';
+        
+        Object.entries(extractedData).forEach(([key, value]) => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'extracted-field';
+            fieldDiv.style.cssText = 'margin: 8px 0; padding: 8px; border: 1px solid #ddd; border-radius: 4px;';
+            
+            const label = document.createElement('span');
+            label.className = 'field-label';
+            label.style.cssText = 'font-weight: bold; display: inline-block; min-width: 120px;';
+            label.textContent = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) + ': ';
+            
+            const valueSpan = document.createElement('span');
+            valueSpan.className = 'field-value';
+            valueSpan.textContent = value || 'Not found';
+            
+            fieldDiv.appendChild(label);
+            fieldDiv.appendChild(valueSpan);
+            fieldsDiv.appendChild(fieldDiv);
+        });
+        
+        resultsContainer.appendChild(fieldsDiv);
+        
+        const saveBtn = document.getElementById('save-extracted-btn');
+        if (saveBtn) {
+            saveBtn.classList.remove('hidden');
+        }
+    } else {
+        const noDataDiv = document.createElement('div');
+        noDataDiv.innerHTML = `
+            <p>No structured information could be extracted from the document.</p>
+            ${rawText ? '<p>However, text was detected. The document might not match the expected format, or the text quality might be too low for pattern matching.</p>' : '<p>No text could be detected in the image. Please ensure the image is clear and contains readable text.</p>'}
+        `;
+        resultsContainer.appendChild(noDataDiv);
+    }
+    
+    const processAnotherBtn = document.getElementById('process-another-btn');
+    if (processAnotherBtn) {
+        processAnotherBtn.classList.remove('hidden');
+    }
+}
+
+function processAnother() {
+    document.getElementById('preview-section').classList.add('hidden');
+    document.getElementById('ocr-section').classList.add('hidden');
+    document.getElementById('camera-section').classList.add('hidden');
+    capturedDocument = null;
+    currentDocumentType = null;
+}
+        // Logout function
+        function logout() {
+    currentUser = null;
+    
+    // Clear auth token
+    localStorage.removeItem('authToken');
+    
+    // Stop any active streams
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+    if (livenessStream) {
+        livenessStream.getTracks().forEach(track => track.stop());
+        livenessStream = null;
+    }
+    
+    // Clear forms
+    document.getElementById('login-form').reset();
+    document.getElementById('register-form').reset();
+    
+    // Reset progress and status
+    document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('status-message').classList.add('hidden');
+    
+    // Show landing page
+    showSection('landing-section');
+    
+    // Show logout confirmation
+    setTimeout(() => {
+        const notification = document.createElement('div');
+        notification.className = 'status-message status-success';
+        notification.textContent = '👋 Successfully logged out. Thank you for using SecureID!';
+        notification.style.position = 'fixed';
+        notification.style.top = '20px';
+        notification.style.right = '20px';
+        notification.style.zIndex = '1000';
+        notification.style.maxWidth = '300px';
+        notification.style.animation = 'slideIn 0.3s ease-out';
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }, 500);
+}
+// Helper function for authenticated requests
+function getAuthHeaders() {
+    const token = localStorage.getItem('authToken');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+}
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('landing-section');
+            
+            // Add smooth animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                
+                .auth-section {
+                    animation: fadeIn 0.5s ease-in-out;
+                }
+                
+                .feature-card {
+                    animation: fadeIn 0.6s ease-in-out;
+                }
+                
+                .service-card {
+                    animation: fadeIn 0.7s ease-in-out;
+                }
+                
+                .btn:active {
+                    transform: scale(0.98);
+                }
+                
+                /* Enhanced responsive design */
+                @media (max-width: 480px) {
+                    .container {
+                        padding: 15px;
+                        margin: 10px;
+                    }
+                    
+                    .logo {
+                        font-size: 2em;
+                    }
+                    
+                    .landing-hero h1 {
+                        font-size: 2em;
+                    }
+                    
+                    .features-grid {
+                        grid-template-columns: 1fr;
+                    }
+                    
+                    .services-grid {
+                        grid-template-columns: 1fr;
+                    }
+                    
+                    .cta-buttons {
+                        flex-direction: column;
+                        gap: 10px;
+                    }
+                }
+                
+                /* Loading animation improvements */
+                .loader {
+                    border: 3px solid rgba(102, 126, 234, 0.3);
+                    border-top: 3px solid #667eea;
+                    border-radius: 50%;
+                    width: 35px;
+                    height: 35px;
+                    animation: spin 1s linear infinite;
+                }
+                
+                /* Enhanced hover effects */
+                .feature-card:hover .feature-icon {
+                    transform: scale(1.1);
+                    transition: transform 0.3s ease;
+                }
+                
+                .service-card:hover .service-icon {
+                    transform: scale(1.1);
+                    transition: transform 0.3s ease;
+                }
+                
+                /* Better form focus states */
+                .form-group input:focus {
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                    border-color: #667eea;
+                }
+                
+                /* Enhanced button states */
+                .btn:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                    transform: none;
+                }
+                
+                .btn-primary:disabled:hover {
+                    transform: none;
+                    box-shadow: none;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add keyboard navigation support
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // Close notifications on escape
+                    const notifications = document.querySelectorAll('.status-message[style*="position: fixed"]');
+                    notifications.forEach(notif => notif.remove());
+                }
+            });
+            
+            // Add error handling for camera access
+            window.addEventListener('error', function(e) {
+                console.error('Global error:', e);
+                if (e.message.includes('camera') || e.message.includes('getUserMedia')) {
+                    const statusMessage = document.getElementById('status-message');
+                    if (statusMessage) {
+                        statusMessage.textContent = 'Camera access error. Please refresh and allow camera permissions.';
+                        statusMessage.className = 'status-message status-error';
+                        statusMessage.classList.remove('hidden');
+                    }
+                }
+            });
+        });
+
+        // Additional utility functions
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `status-message status-${type}`;
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.zIndex = '1000';
+            notification.style.maxWidth = '300px';
+            notification.style.animation = 'slideIn 0.3s ease-out';
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        // Enhanced security features
+        function validatePassword(password) {
+            const minLength = 8;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasNumbers = /\d/.test(password);
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            
+            if (password.length < minLength) {
+                return 'Password must be at least 8 characters long';
+            }
+            if (!hasUpperCase) {
+                return 'Password must contain at least one uppercase letter';
+            }
+            if (!hasLowerCase) {
+                return 'Password must contain at least one lowercase letter';
+            }
+            if (!hasNumbers) {
+                return 'Password must contain at least one number';
+            }
+            if (!hasSpecialChar) {
+                return 'Password must contain at least one special character';
+            }
+            
+            return null; // Password is valid
+        }
+
+        // Enhanced form validation
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Add real-time form validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordField = document.getElementById('reg-password');
+            const confirmPasswordField = document.getElementById('reg-confirm-password');
+            const emailField = document.getElementById('reg-email');
+            
+            if (passwordField) {
+                passwordField.addEventListener('input', function() {
+                    const validation = validatePassword(this.value);
+                    const existingError = this.parentNode.querySelector('.validation-error');
+                    
+                    if (validation && this.value.length > 0) {
+                        if (!existingError) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'validation-error';
+                            errorDiv.style.color = '#dc3545';
+                            errorDiv.style.fontSize = '12px';
+                            errorDiv.style.marginTop = '5px';
+                            errorDiv.textContent = validation;
+                            this.parentNode.appendChild(errorDiv);
+                        } else {
+                            existingError.textContent = validation;
+                        }
+                        this.style.borderColor = '#dc3545';
+                    } else {
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        this.style.borderColor = this.value.length > 0 ? '#28a745' : '#e0e0e0';
+                    }
+                });
+            }
+            
+            if (confirmPasswordField) {
+                confirmPasswordField.addEventListener('input', function() {
+                    const password = document.getElementById('reg-password').value;
+                    const existingError = this.parentNode.querySelector('.validation-error');
+                    
+                    if (this.value && this.value !== password) {
+                        if (!existingError) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'validation-error';
+                            errorDiv.style.color = '#dc3545';
+                            errorDiv.style.fontSize = '12px';
+                            errorDiv.style.marginTop = '5px';
+                            errorDiv.textContent = 'Passwords do not match';
+                            this.parentNode.appendChild(errorDiv);
+                        }
+                        this.style.borderColor = '#dc3545';
+                    } else {
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        this.style.borderColor = this.value.length > 0 ? '#28a745' : '#e0e0e0';
+                    }
+                });
+            }
+            
+            if (emailField) {
+                emailField.addEventListener('input', function() {
+                    const existingError = this.parentNode.querySelector('.validation-error');
+                    
+                    if (this.value && !validateEmail(this.value)) {
+                        if (!existingError) {
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'validation-error';
+                            errorDiv.style.color = '#dc3545';
+                            errorDiv.style.fontSize = '12px';
+                            errorDiv.style.marginTop = '5px';
+                            errorDiv.textContent = 'Please enter a valid email address';
+                            this.parentNode.appendChild(errorDiv);
+                        }
+                        this.style.borderColor = '#dc3545';
+                    } else {
+                        if (existingError) {
+                            existingError.remove();
+                        }
+                        this.style.borderColor = this.value.length > 0 ? '#28a745' : '#e0e0e0';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

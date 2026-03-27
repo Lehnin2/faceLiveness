@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Generator - SecureID</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffffff 0%, #ffffffff 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* Document Generation Section */
+        .document-generator {
+            display: none;
+        }
+
+        .document-generator.active {
+            display: block;
+        }
+
+        .generator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .generator-title {
+            font-size: 1.8em;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        /* Document Preview */
+        .document-preview {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 40px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+            position: relative;
+        }
+
+        .document-preview.birth-certificate {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e6f2ff 100%);
+            border: 3px solid #4a90e2;
+        }
+
+        .document-preview.marriage-certificate {
+            background: linear-gradient(135deg, #fff8f0 0%, #ffe6e6 100%);
+            border: 3px solid #d4af37;
+        }
+
+        .document-preview.identity-card {
+            background: linear-gradient(135deg, #f0f8f0 0%, #e6ffe6 100%);
+            border: 3px solid #28a745;
+            max-width: 400px;
+            min-height: 250px;
+            margin: 20px auto;
+        }
+
+        .document-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid currentColor;
+        }
+
+        .document-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .document-subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+        .document-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .content-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .field-label {
+            font-weight: bold;
+            min-width: 120px;
+            margin-right: 10px;
+        }
+
+        .field-value {
+            font-family: 'Courier New', monospace;
+            background: rgba(255,255,255,0.8);
+            padding: 4px 8px;
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        /* Identity Card Specific Styles */
+        .id-card-layout {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .id-photo {
+            width: 100px;
+            height: 120px;
+            background: #f0f0f0;
+            border: 2px solid #333;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .id-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .id-field {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.2);
+        }
+
+        .document-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid currentColor;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .official-seal {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            border: 3px solid currentColor;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            text-align: center;
+            opacity: 0.6;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .document-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .generator-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 SecureID Document Generator</h1>
+            <p>Generate official documents with AI-powered templates</p>
+        </div>
+
+        <!-- Document Type Selection -->
+        <div id="document-selection" class="document-generator active">
+            <h2 style="text-align: center; margin-bottom: 30px;">Select Document Type</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="service-card" onclick="selectDocumentType('birth')" style="background: white; padding: 30px; border-radius: 15px; text-align: center; cursor: pointer; border: 2px solid #e0e0e0; transition: all 0.3s;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">📜</div>
+                    <h3>Birth Certificate</h3>
+                    <p>Generate official birth certificate</p>
+                </div>
+                <div class="service-card" onclick="selectDocumentType('marriage')" style="background: white; padding: 30px; border-radius: 15px; text-align: center; cursor: pointer; border: 2px solid #e0e0e0; transition: all 0.3s;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">💍</div>
+                    <h3>Marriage Certificate</h3>
+                    <p>Generate marriage certificate</p>
+                </div>
+                <div class="service-card" onclick="selectDocumentType('identity')" style="background: white; padding: 30px; border-radius: 15px; text-align: center; cursor: pointer; border: 2px solid #e0e0e0; transition: all 0.3s;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">🆔</div>
+                    <h3>Identity Card</h3>
+                    <p>Generate identity card with photo</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Birth Certificate Generator -->
+        <div id="birth-generator" class="document-generator">
+            <div class="generator-header">
+                <div class="generator-title">
+                    📜 Birth Certificate Generator
+                </div>
+                <button class="btn btn-secondary" onclick="showDocumentSelection()">← Back</button>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="birth-first-name">First Name</label>
+                    <input type="text" id="birth-first-name" placeholder="Enter first name">
+                </div>
+                <div class="form-group">
+                    <label for="birth-last-name">Last Name</label>
+                    <input type="text" id="birth-last-name" placeholder="Enter last name">
+                </div>
+                <div class="form-group">
+                    <label for="birth-date">Date of Birth</label>
+                    <input type="date" id="birth-date">
+                </div>
+                <div class="form-group">
+                    <label for="birth-place">Place of Birth</label>
+                    <input type="text" id="birth-place" placeholder="City, State">
+                </div>
+                <div class="form-group">
+                    <label for="birth-father">Father's Name</label>
+                    <input type="text" id="birth-father" placeholder="Father's full name">
+                </div>
+                <div class="form-group">
+                    <label for="birth-mother">Mother's Name</label>
+                    <input type="text" id="birth-mother" placeholder="Mother's full name">
+                </div>
+                <div class="form-group">
+                    <label for="birth-gender">Gender</label>
+                    <select id="birth-gender">
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="birth-registration">Registration Number</label>
+                    <input type="text" id="birth-registration" placeholder="Auto-generated" readonly>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn btn-primary" onclick="generateBirthCertificate()">Generate Preview</button>
+                <button class="btn btn-secondary" onclick="clearBirthForm()">Clear Form</button>
+            </div>
+
+            <div id="birth-preview" class="hidden">
+                <div class="document-preview birth-certificate">
+                    <div class="document-header">
+                        <div class="document-title" style="color: #4a90e2;">Certificate of Birth</div>
+                        <div class="document-subtitle">Official Government Document</div>
+                    </div>
+                    <div class="document-content" id="birth-content"></div>
+                    <div class="document-footer">
+                        This document is generated by SecureID Biometric System<br>
+                        Issued: <span id="birth-issue-date"></span>
+                    </div>
+                    <div class="official-seal" style="color: #4a90e2;">
+                        OFFICIAL<br>SEAL
+                    </div>
+                </div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn btn-success" onclick="downloadDocument('birth')">📄 Download PDF</button>
+                    <button class="btn btn-primary" onclick="generateBirthCertificate()">🔄 Update Preview</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marriage Certificate Generator -->
+        <div id="marriage-generator" class="document-generator">
+            <div class="generator-header">
+                <div class="generator-title">
+                    💍 Marriage Certificate Generator
+                </div>
+                <button class="btn btn-secondary" onclick="showDocumentSelection()">← Back</button>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="spouse1-first">Spouse 1 - First Name</label>
+                    <input type="text" id="spouse1-first" placeholder="First name">
+                </div>
+                <div class="form-group">
+                    <label for="spouse1-last">Spouse 1 - Last Name</label>
+                    <input type="text" id="spouse1-last" placeholder="Last name">
+                </div>
+                <div class="form-group">
+                    <label for="spouse2-first">Spouse 2 - First Name</label>
+                    <input type="text" id="spouse2-first" placeholder="First name">
+                </div>
+                <div class="form-group">
+                    <label for="spouse2-last">Spouse 2 - Last Name</label>
+                    <input type="text" id="spouse2-last" placeholder="Last name">
+                </div>
+                <div class="form-group">
+                    <label for="marriage-date">Marriage Date</label>
+                    <input type="date" id="marriage-date">
+                </div>
+                <div class="form-group">
+                    <label for="marriage-place">Place of Marriage</label>
+                    <input type="text" id="marriage-place" placeholder="City, State">
+                </div>
+                <div class="form-group">
+                    <label for="officiant">Officiant Name</label>
+                    <input type="text" id="officiant" placeholder="Person who performed ceremony">
+                </div>
+                <div class="form-group">
+                    <label for="marriage-registration">Registration Number</label>
+                    <input type="text" id="marriage-registration" placeholder="Auto-generated" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="witness1">Witness 1 Name</label>
+                    <input type="text" id="witness1" placeholder="First witness">
+                </div>
+                <div class="form-group">
+                    <label for="witness2">Witness 2 Name</label>
+                    <input type="text" id="witness2" placeholder="Second witness">
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn btn-primary" onclick="generateMarriageCertificate()">Generate Preview</button>
+                <button class="btn btn-secondary" onclick="clearMarriageForm()">Clear Form</button>
+            </div>
+
+            <div id="marriage-preview" class="hidden">
+                <div class="document-preview marriage-certificate">
+                    <div class="document-header">
+                        <div class="document-title" style="color: #d4af37;">Certificate of Marriage</div>
+                        <div class="document-subtitle">Official Government Document</div>
+                    </div>
+                    <div class="document-content" id="marriage-content"></div>
+                    <div class="document-footer">
+                        This document is generated by SecureID Biometric System<br>
+                        Issued: <span id="marriage-issue-date"></span>
+                    </div>
+                    <div class="official-seal" style="color: #d4af37;">
+                        OFFICIAL<br>SEAL
+                    </div>
+                </div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn btn-success" onclick="downloadDocument('marriage')">📄 Download PDF</button>
+                    <button class="btn btn-primary" onclick="generateMarriageCertificate()">🔄 Update Preview</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Identity Card Generator -->
+        <div id="identity-generator" class="document-generator">
+            <div class="generator-header">
+                <div class="generator-title">
+                    🆔 Identity Card Generator
+                </div>
+                <button class="btn btn-secondary" onclick="showDocumentSelection()">← Back</button>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="id-first-name">First Name</label>
+                    <input type="text" id="id-first-name" placeholder="Enter first name">
+                </div>
+                <div class="form-group">
+                    <label for="id-last-name">Last Name</label>
+                    <input type="text" id="id-last-name" placeholder="Enter last name">
+                </div>
+                <div class="form-group">
+                    <label for="id-dob">Date of Birth</label>
+                    <input type="date" id="id-dob">
+                </div>
+                <div class="form-group">
+                    <label for="id-address">Address</label>
+                    <input type="text" id="id-address" placeholder="Full address">
+                </div>
+                <div class="form-group">
+                    <label for="id-nationality">Nationality</label>
+                    <input type="text" id="id-nationality" placeholder="Nationality">
+                </div>
+                <div class="form-group">
+                    <label for="id-number">ID Number</label>
+                    <input type="text" id="id-number" placeholder="Auto-generated" readonly>
+                </div>
+                <div class="form-group full-width">
+                    <label>Photo (Will use your registered face)</label>
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: center; color: #666;">
+                        📸 Your registered biometric photo will be used automatically
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn btn-primary" onclick="generateIdentityCard()">Generate Preview</button>
+                <button class="btn btn-secondary" onclick="clearIdentityForm()">Clear Form</button>
+            </div>
+
+            <div id="identity-preview" class="hidden">
+                <div class="document-preview identity-card">
+                    <div class="document-header">
+                        <div class="document-title" style="color: #28a745; font-size: 1.5em;">IDENTITY CARD</div>
+                        <div class="document-subtitle" style="font-size: 0.9em;">Government Issued ID</div>
+                    </div>
+                    <div class="id-card-layout" id="identity-content">
+                        <div class="id-photo" id="id-photo-preview">
+                            📸<br>PHOTO
+                        </div>
+                        <div class="id-info" id="id-info-content"></div>
+                    </div>
+                    <div class="document-footer" style="margin-top: 20px; font-size: 10px;">
+                        SecureID Biometric System | Issued: <span id="identity-issue-date"></span>
+                    </div>
+                </div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn btn-success" onclick="downloadDocument('identity')">📄 Download PDF</button>
+                    <button class="btn btn-primary" onclick="generateIdentityCard()">🔄 Update Preview</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentDocumentType = null;
+        let userPhoto = null; // Will be populated from the main app
+
+        // Navigation functions
+        function showDocumentSelection() {
+            document.querySelectorAll('.document-generator').forEach(gen => {
+                gen.classList.remove('active');
+            });
+            document.getElementById('document-selection').classList.add('active');
+            currentDocumentType = null;
+        }
+
+        // Load user photo when document selection is made
+function selectDocumentType(type) {
+    document.querySelectorAll('.document-generator').forEach(gen => {
+        gen.classList.remove('active');
+    });
+    currentDocumentType = type;
+    
+    const generatorMap = {
+        'birth': 'birth-generator',
+        'marriage': 'marriage-generator',
+        'identity': 'identity-generator'
+    };
+    
+    document.getElementById(generatorMap[type]).classList.add('active');
+    
+    // Auto-generate registration numbers
+    if (type === 'birth') {
+        document.getElementById('birth-registration').value = generateRegistrationNumber();
+    } else if (type === 'marriage') {
+        document.getElementById('marriage-registration').value = generateRegistrationNumber();
+    } else if (type === 'identity') {
+        document.getElementById('id-number').value = generateIDNumber();
+        // Load user photo for identity card
+        loadUserPhoto();
+    }
+}
+
+        // Utility functions
+        function generateRegistrationNumber() {
+            const year = new Date().getFullYear();
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `${year}-${random}`;
+        }
+
+        function generateIDNumber() {
+            const random = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+            return `ID${random}`;
+        }
+
+        function getCurrentDate() {
+            return new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Birth Certificate Functions
+        function generateBirthCertificate() {
+            const data = {
+                firstName: document.getElementById('birth-first-name').value,
+                lastName: document.getElementById('birth-last-name').value,
+                birthDate: document.getElementById('birth-date').value,
+                birthPlace: document.getElementById('birth-place').value,
+                father: document.getElementById('birth-father').value,
+                mother: document.getElementById('birth-mother').value,
+                gender: document.getElementById('birth-gender').value,
+                registration: document.getElementById('birth-registration').value
+            };
+
+            if (!data.firstName || !data.lastName || !data.birthDate) {
+                alert('Please fill in all required fields (Name and Birth Date)');
+                return;
+            }
+
+            const content = document.getElementById('birth-content');
+            content.innerHTML = `
+                <div class="content-field">
+                    <span class="field-label">Full Name:</span>
+                    <span class="field-value">${data.firstName} ${data.lastName}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Date of Birth:</span>
+                    <span class="field-value">${new Date(data.birthDate).toLocaleDateString()}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Place of Birth:</span>
+                    <span class="field-value">${data.birthPlace}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Gender:</span>
+                    <span class="field-value">${data.gender}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Father's Name:</span>
+                    <span class="field-value">${data.father}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Mother's Name:</span>
+                    <span class="field-value">${data.mother}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Registration No:</span>
+                    <span class="field-value">${data.registration}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Issue Date:</span>
+                    <span class="field-value">${getCurrentDate()}</span>
+                </div>
+            `;
+
+            document.getElementById('birth-issue-date').textContent = getCurrentDate();
+            document.getElementById('birth-preview').classList.remove('hidden');
+        }
+
+        function clearBirthForm() {
+            document.querySelectorAll('#birth-generator input, #birth-generator select').forEach(input => {
+                if (!input.readOnly) input.value = '';
+            });
+            document.getElementById('birth-registration').value = generateRegistrationNumber();
+            document.getElementById('birth-preview').classList.add('hidden');
+        }
+
+        // Marriage Certificate Functions
+        function generateMarriageCertificate() {
+            const data = {
+                spouse1First: document.getElementById('spouse1-first').value,
+                spouse1Last: document.getElementById('spouse1-last').value,
+                spouse2First: document.getElementById('spouse2-first').value,
+                spouse2Last: document.getElementById('spouse2-last').value,
+                marriageDate: document.getElementById('marriage-date').value,
+                marriagePlace: document.getElementById('marriage-place').value,
+                officiant: document.getElementById('officiant').value,
+                registration: document.getElementById('marriage-registration').value,
+                witness1: document.getElementById('witness1').value,
+                witness2: document.getElementById('witness2').value
+            };
+
+            if (!data.spouse1First || !data.spouse2First || !data.marriageDate) {
+                alert('Please fill in all required fields (Both spouse names and marriage date)');
+                return;
+            }
+
+            const content = document.getElementById('marriage-content');
+            content.innerHTML = `
+                <div class="content-field">
+                    <span class="field-label">Spouse 1:</span>
+                    <span class="field-value">${data.spouse1First} ${data.spouse1Last}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Spouse 2:</span>
+                    <span class="field-value">${data.spouse2First} ${data.spouse2Last}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Marriage Date:</span>
+                    <span class="field-value">${new Date(data.marriageDate).toLocaleDateString()}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Place of Marriage:</span>
+                    <span class="field-value">${data.marriagePlace}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Officiant:</span>
+                    <span class="field-value">${data.officiant}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Registration No:</span>
+                    <span class="field-value">${data.registration}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Witness 1:</span>
+                    <span class="field-value">${data.witness1}</span>
+                </div>
+                <div class="content-field">
+                    <span class="field-label">Witness 2:</span>
+                    <span class="field-value">${data.witness2}</span>
+                </div>
+            `;
+
+            document.getElementById('marriage-issue-date').textContent = getCurrentDate();
+            document.getElementById('marriage-preview').classList.remove('hidden');
+        }
+
+        function clearMarriageForm() {
+            document.querySelectorAll('#marriage-generator input').forEach(input => {
+                if (!input.readOnly) input.value = '';
+            });
+            document.getElementById('marriage-registration').value = generateRegistrationNumber();
+            document.getElementById('marriage-preview').classList.add('hidden');
+        }
+
+        // Enhanced identity card generation with photo
+function generateIdentityCard() {
+    const data = {
+        firstName: document.getElementById('id-first-name').value,
+        lastName: document.getElementById('id-last-name').value,
+        dob: document.getElementById('id-dob').value,
+        address: document.getElementById('id-address').value,
+        nationality: document.getElementById('id-nationality').value,
+        idNumber: document.getElementById('id-number').value
+    };
+
+    if (!data.firstName || !data.lastName || !data.dob) {
+        alert('Please fill in all required fields (Name and Date of Birth)');
+        return;
+    }
+
+    const infoContent = document.getElementById('id-info-content');
+    infoContent.innerHTML = `
+        <div class="id-field">
+            <span style="font-weight: bold;">NAME:</span>
+            <span>${data.firstName} ${data.lastName}</span>
+        </div>
+        <div class="id-field">
+            <span style="font-weight: bold;">DOB:</span>
+            <span>${new Date(data.dob).toLocaleDateString()}</span>
+        </div>
+        <div class="id-field">
+            <span style="font-weight: bold;">ID:</span>
+            <span>${data.idNumber}</span>
+        </div>
+        <div class="id-field">
+            <span style="font-weight: bold;">NATIONALITY:</span>
+            <span>${data.nationality}</span>
+        </div>
+        <div class="id-field" style="font-size: 10px;">
+            <span style="font-weight: bold;">ADDRESS:</span>
+            <span>${data.address}</span>
+        </div>
+    `;
+
+    // Display photo in preview
+    const photoPreview = document.getElementById('id-photo-preview');
+    if (userPhoto) {
+        photoPreview.style.backgroundImage = `url(${userPhoto})`;
+        photoPreview.style.backgroundSize = 'cover';
+        photoPreview.style.backgroundPosition = 'center';
+        photoPreview.innerHTML = '';
+    } else {
+        photoPreview.style.backgroundImage = 'none';
+        photoPreview.innerHTML = '📸<br>PHOTO';
+        // Try to load photo if not already loaded
+        loadUserPhoto();
+    }
+
+    document.getElementById('identity-issue-date').textContent = getCurrentDate();
+    document.getElementById('identity-preview').classList.remove('hidden');
+}
+
+// Initialize photo loading on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Existing code...
+    
+    // Load user photo if we're starting with identity card
+    if (currentDocumentType === 'identity') {
+        loadUserPhoto();
+    }
+});
+
+        function clearIdentityForm() {
+            document.querySelectorAll('#identity-generator input').forEach(input => {
+                if (!input.readOnly) input.value = '';
+            });
+            document.getElementById('id-number').value = generateIDNumber();
+            document.getElementById('identity-preview').classList.add('hidden');
+        }
+
+        // Add this to your HTML file's JavaScript section
+
+// Enhanced photo loading and integration
+async function loadUserPhoto() {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            console.log('No auth token found');
+            return;
+        }
+
+        const response = await fetch('/api/user/face-photo', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.face_photo) {
+                userPhoto = data.face_photo;
+                console.log('✅ User photo loaded successfully');
+                
+                // Update any existing ID card preview
+                const photoPreview = document.getElementById('id-photo-preview');
+                if (photoPreview && userPhoto) {
+                    photoPreview.style.backgroundImage = `url(${userPhoto})`;
+                    photoPreview.style.backgroundSize = 'cover';
+                    photoPreview.style.backgroundPosition = 'center';
+                    photoPreview.innerHTML = '';
+                }
+            } else {
+                console.log('No face photo available');
+                userPhoto = null;
+            }
+        } else {
+            console.log('Failed to load user photo');
+            userPhoto = null;
+        }
+    } catch (error) {
+        console.error('Error loading user photo:', error);
+        userPhoto = null;
+    }
+}
+
+// Enhanced download function that includes photo data
+async function downloadDocument(type) {
+    try {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            alert('Please log in to download documents');
+            return;
+        }
+
+        // Collect form data based on document type
+        let formData = {};
+        
+        if (type === 'identity') {
+            formData = {
+                firstName: document.getElementById('id-first-name').value,
+                lastName: document.getElementById('id-last-name').value,
+                dateOfBirth: document.getElementById('id-dob').value,
+                address: document.getElementById('id-address').value,
+                nationality: document.getElementById('id-nationality').value,
+                idNumber: document.getElementById('id-number').value,
+                // Include the photo data
+                photoData: userPhoto
+            };
+        } else if (type === 'birth') {
+            formData = {
+                firstName: document.getElementById('birth-first-name').value,
+                lastName: document.getElementById('birth-last-name').value,
+                birthDate: document.getElementById('birth-date').value,
+                birthPlace: document.getElementById('birth-place').value,
+                fatherName: document.getElementById('birth-father').value,
+                motherName: document.getElementById('birth-mother').value,
+                gender: document.getElementById('birth-gender').value,
+                registrationNumber: document.getElementById('birth-registration').value
+            };
+        } else if (type === 'marriage') {
+            formData = {
+                spouse1Name: `${document.getElementById('spouse1-first').value} ${document.getElementById('spouse1-last').value}`,
+                spouse2Name: `${document.getElementById('spouse2-first').value} ${document.getElementById('spouse2-last').value}`,
+                marriageDate: document.getElementById('marriage-date').value,
+                marriagePlace: document.getElementById('marriage-place').value,
+                officiant: document.getElementById('officiant').value,
+                witnesses: `${document.getElementById('witness1').value}, ${document.getElementById('witness2').value}`,
+                registrationNumber: document.getElementById('marriage-registration').value
+            };
+        }
+
+        // Show loading state
+        const downloadButton = event.target;
+        const originalText = downloadButton.textContent;
+        downloadButton.textContent = '⏳ Generating...';
+        downloadButton.disabled = true;
+
+        // Send request to backend
+        const response = await fetch('/api/generate-document', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                document_type: type === 'identity' ? 'identity-card' : 
+                              type === 'birth' ? 'birth-certificate' : 'marriage-certificate',
+                form_data: formData
+            })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            
+            // Create download link
+            const pdfBlob = new Blob([Uint8Array.from(atob(result.pdf_data), c => c.charCodeAt(0))], {
+                type: 'application/pdf'
+            });
+            
+            const downloadUrl = URL.createObjectURL(pdfBlob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = result.filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(downloadUrl);
+
+            alert('Document downloaded successfully!');
+        } else {
+            const error = await response.json();
+            alert(`Download failed: ${error.error}`);
+        }
+
+    } catch (error) {
+        console.error('Download error:', error);
+        alert('Download failed. Please try again.');
+    } finally {
+        // Reset button state
+        const downloadButton = event.target;
+        downloadButton.textContent = originalText;
+        downloadButton.disabled = false;
+    }
+}
+
+
+        // Function to set user photo from main app
+        function setUserPhoto(photoDataUrl) {
+            userPhoto = photoDataUrl;
+        }
+
+        // Enhanced service card hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.borderColor = '#667eea';
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.15)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.borderColor = '#e0e0e0';
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
+
+            // Auto-generate registration numbers on page load
+            setTimeout(() => {
+                const birthReg = document.getElementById('birth-registration');
+                const marriageReg = document.getElementById('marriage-registration');
+                const idNumber = document.getElementById('id-number');
+                
+                if (birthReg) birthReg.value = generateRegistrationNumber();
+                if (marriageReg) marriageReg.value = generateRegistrationNumber();
+                if (idNumber) idNumber.value = generateIDNumber();
+            }, 100);
+        });
+
+        // Integration functions for main app
+        window.documentGenerator = {
+            selectDocumentType: selectDocumentType,
+            setUserPhoto: setUserPhoto,
+            showDocumentSelection: showDocumentSelection
+        };
+    </script>
+</body>
+</html>
